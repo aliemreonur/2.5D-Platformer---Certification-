@@ -7,11 +7,10 @@ public class MovingPlatform : MonoBehaviour
     [SerializeField] private Transform _moveStartPoint, _moveEndPoint;
     private bool _returning = false;
     [SerializeField] private float _speed = 6f;
-    [SerializeField] private bool _waitOnPoint = false;
+    //[SerializeField] private bool _waitOnPoint = false;
     [SerializeField] private float _waitDelay;
     private float _currentSpeed;
 
-    private bool _movingFromStart = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,7 +19,7 @@ public class MovingPlatform : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if(_moveEndPoint != null || _moveStartPoint != null)
         {
@@ -48,16 +47,19 @@ public class MovingPlatform : MonoBehaviour
 
     IEnumerator PointWaitRoutine()
     {
-        if(_waitOnPoint)
+        if(_waitDelay != 0)
         {
-             //this is for making sure to set the speed same as the inspectoro if changed.
             _speed = 0;
             yield return new WaitForSeconds(_waitDelay);
             _speed = _currentSpeed;
         }
-        //else
-        //{
-          //  yield return new WaitForSeconds(0f);
-        //}
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if(other.transform.tag == "Player")
+        {
+            Debug.Log("Player is on the moving platform!");
+        }
     }
 }
