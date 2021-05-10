@@ -51,13 +51,7 @@ public class Elevator : MonoBehaviour
         _speed = 3f;
     }
 
-    private void OnCollisionEnter(Collision other)
-    {
-        if(other.transform.tag == "Player")
-        {
-            Debug.Log("Player on the elevator");
-        }
-    }
+
 
 
 }

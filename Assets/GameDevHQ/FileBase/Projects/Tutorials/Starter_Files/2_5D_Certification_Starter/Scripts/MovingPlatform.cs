@@ -55,11 +55,14 @@ public class MovingPlatform : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision other)
+
+    public void PlayerisOnTop(GameObject player)
     {
-        if(other.transform.tag == "Player")
-        {
-            Debug.Log("Player is on the moving platform!");
-        }
+        player.transform.parent = this.transform;
+    }
+
+    public void PlayerHasLeft(GameObject player)
+    {
+        player.transform.parent = null;
     }
 }
