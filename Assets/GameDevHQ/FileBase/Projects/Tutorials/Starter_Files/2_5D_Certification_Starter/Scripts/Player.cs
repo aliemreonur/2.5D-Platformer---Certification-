@@ -12,9 +12,22 @@ public class Player : MonoBehaviour
     [SerializeField] private float _gravity = 1f;
     private bool _jumping = false;
     private bool _onLedge = false;
+    private bool _rolling = false;
     private Ledge _activeLedge;
 
     private Vector3 _direction, _velocity;
+
+    public bool Rolling
+    {
+        get
+        {
+            return _rolling;
+        }
+        set
+        {
+            _rolling = value;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +48,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         Move();
+        Roll();
 
         if(_onLedge)
         {
@@ -47,7 +61,7 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
-        if (_cc.isGrounded)
+        if (_cc.isGrounded && !_rolling)
         {
             float horizontalInput = Input.GetAxisRaw("Horizontal");
             _direction = new Vector3(0, 0, horizontalInput) * _speed;
@@ -98,6 +112,20 @@ public class Player : MonoBehaviour
         //this is for a better look 
         transform.position = handposition;
         _activeLedge = currentLedge;
+    }
+
+    void Roll()
+    {
+        if(_cc.isGrounded)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                _animator.SetTrigger("Roll");
+                _rolling = true;
+            }
+        }
+
+        //works but the platforms seem to be a little bit short for this animation clip
     }
 
     public void ClimbPosition()
