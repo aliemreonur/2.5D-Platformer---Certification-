@@ -122,6 +122,7 @@ public class Player : MonoBehaviour
             {
                 _animator.SetTrigger("Roll");
                 _rolling = true;
+                //StartCoroutine(RollFixRoutine());
             }
         }
 
@@ -133,5 +134,15 @@ public class Player : MonoBehaviour
         transform.position = _activeLedge.standPos;
         _animator.SetBool("LedgeGrab", false);
         _cc.enabled = true;
+    }
+
+    IEnumerator RollFixRoutine()
+    {
+        //this fix is for player stunning if we somehow make the animation end before the animation exit method is called.
+        //did not behave the way I have desired
+            _rolling = true;
+            yield return new WaitForSeconds(2.5f);
+            _rolling = false;
+        
     }
 }
