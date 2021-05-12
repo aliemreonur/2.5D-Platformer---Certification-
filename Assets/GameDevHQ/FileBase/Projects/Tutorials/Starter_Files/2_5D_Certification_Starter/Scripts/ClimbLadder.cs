@@ -3,18 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ClimbLadder : MonoBehaviour
-{ 
+{
+    [SerializeField] private GameObject ladderKeyImg;
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        ladderKeyImg.gameObject.SetActive(false);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            StartCoroutine(ClimbTextOnRoutine());
+        }
+
     }
 
     private void OnTriggerStay(Collider other)
     {
         if(other.gameObject.tag == "Player")
         {
+            //StartCoroutine(ClimbTextOnRoutine());
             Player player = other.gameObject.GetComponent<Player>();
             if(player != null)
             {
@@ -24,8 +34,12 @@ public class ClimbLadder : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    IEnumerator ClimbTextOnRoutine()
     {
-        
+        ladderKeyImg.gameObject.SetActive(true);
+        yield return new WaitForSeconds(5f);
+        ladderKeyImg.gameObject.SetActive(false);
     }
+
+ 
 }
