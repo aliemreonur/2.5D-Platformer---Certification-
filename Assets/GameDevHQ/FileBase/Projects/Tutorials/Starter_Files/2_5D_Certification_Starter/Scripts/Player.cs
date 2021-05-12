@@ -13,7 +13,9 @@ public class Player : MonoBehaviour
     private bool _jumping = false;
     private bool _onLedge = false;
     private bool _rolling = false;
+    [SerializeField] private bool _climbing = false;
     private Ledge _activeLedge;
+    [SerializeField] bool isGrounded = false;
 
     private Vector3 _direction, _velocity;
 
@@ -26,6 +28,17 @@ public class Player : MonoBehaviour
         set
         {
             _rolling = value;
+        }
+    }
+    public bool ClimbLadder
+    {
+        get
+        {
+            return _climbing;
+        }
+        set
+        {
+            _climbing = value;
         }
     }
 
@@ -42,13 +55,17 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("Player Animator is null");
         }
+
+        float currentGravity = _gravity;
     }
 
     // Update is called once per frame
     void Update()
     {
+        isGrounded = _cc.isGrounded;
         Move();
         Roll();
+        Climb();
 
         if(_onLedge)
         {
@@ -61,7 +78,7 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
-        if (_cc.isGrounded && !_rolling)
+        if (_cc.isGrounded && !_rolling && !_climbing)
         {
             float horizontalInput = Input.GetAxisRaw("Horizontal");
             _direction = new Vector3(0, 0, horizontalInput) * _speed;
@@ -95,8 +112,12 @@ public class Player : MonoBehaviour
                 _animator.SetBool("Jump", true);
             }
         }
-        _direction.y -= _gravity;
-        _cc.Move(_direction * Time.deltaTime);
+        if(!_climbing)
+        {
+            _direction.y -= _gravity;
+            _cc.Move(_direction * Time.deltaTime);
+        }
+ 
     }
 
     public void LedgeGrab(Vector3 handposition, Ledge currentLedge)
@@ -129,6 +150,25 @@ public class Player : MonoBehaviour
         //works but the platforms seem to be a little bit short for this animation clip
     }
 
+    void Climb()
+    {
+        if (_climbing)
+        {
+            _animator.SetBool("ClimbLadder", true);
+            _gravity = 0;
+            if (Input.GetAxisRaw("Vertical") != 0)
+            {
+                _animator.speed = 1;
+                float _verticalInput = Input.GetAxisRaw("Vertical");
+                _cc.Move(new Vector3(0, _verticalInput, 0) * _speed * Time.deltaTime);
+            }
+            else
+            {
+                _animator.speed = 0;
+            }
+        }
+    }
+
     public void ClimbPosition()
     {
         transform.position = _activeLedge.standPos;
@@ -136,13 +176,21 @@ public class Player : MonoBehaviour
         _cc.enabled = true;
     }
 
-    IEnumerator RollFixRoutine()
+    public void LadderTop()
     {
-        //this fix is for player stunning if we somehow make the animation end before the animation exit method is called.
-        //did not behave the way I have desired
-            _rolling = true;
-            yield return new WaitForSeconds(2.5f);
-            _rolling = false;
-        
+        _climbing = false;
+        _animator.SetBool("ClimbLadder", false);
+        _gravity = 0.8f; //better to cache this and then call it from here.
+        _cc.enabled = false;
+        _animator.SetBool("LadderTop", true);
     }
+
+    public void LadderTopComplete(Vector3 position)
+    {
+        _climbing = false;
+        transform.position = position;
+        _animator.SetBool("LadderTop", false);
+        _cc.enabled = true;
+    }
+
 }
