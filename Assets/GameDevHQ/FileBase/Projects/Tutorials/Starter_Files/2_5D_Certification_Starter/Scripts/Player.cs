@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     [SerializeField] bool isGrounded = false;
 
     private Vector3 _direction, _velocity;
+    private int _coins;
 
     public bool Rolling
     {
@@ -39,6 +40,13 @@ public class Player : MonoBehaviour
         set
         {
             _climbing = value;
+        }
+    }
+    public int Coins
+    {
+        get
+        {
+            return _coins;
         }
     }
 
@@ -191,6 +199,12 @@ public class Player : MonoBehaviour
         transform.position = position;
         _animator.SetBool("LadderTop", false);
         _cc.enabled = true;
+    }
+
+    public void AddCoins()
+    {
+        _coins++;
+        UIManager.Instance.UpdateCoins(_coins);
     }
 
 }
